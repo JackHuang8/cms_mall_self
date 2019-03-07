@@ -1,6 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
+        host,
         page: 1,
         // 列表商品
         goods_list: [],
@@ -26,6 +27,10 @@ var vm = new Vue({
                 query_string = '?ordering=' + this.ordering;
             }
 			//发送请求
+            var category_id = this.get_query_string('category');
+            axios.get(this.host+'/goods/list/'+category_id+'/'+query_string).then(response =>{
+                this.goods_list = response.data
+            })
         },
 
         // 获取当前显示的类别
@@ -33,6 +38,11 @@ var vm = new Vue({
             // 获取url中的类别id
             var category_id = this.get_query_string('category');
             //发送请求
+            axios.get(this.host+'/goods/daohang/'+category_id+'/').then(response => {
+                this.category = response.data
+            }).catch(error => {
+                alert(error.response.data)
+            })
         },
 
         // 获取url路径参数

@@ -1,6 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
+        host,
         recommend_goods: [],
         categories: [],
     },
@@ -14,12 +15,21 @@ var vm = new Vue({
 		//获取推荐商品
         get_recommend_goods: function () {
            //发送请求
-                })
+            axios.get(this.host+'/goods/recomment/').then(response => {
+                this.recommend_goods = response.data
+            }).catch(error => {
+                alert(error.response.data)
+            })
+
         },
 		//获取分类商品
         get_category_goods: function () {
            //发送请求
-                })
+            axios.get(this.host+'/goods/category/').then(response => {
+                this.categories = response.data
+            }).catch(error => {
+                alert(error.response.data)
+            })
         },
     },
 

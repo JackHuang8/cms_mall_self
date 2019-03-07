@@ -1,7 +1,7 @@
 ﻿var vm = new Vue({
     el: '#app',
     data: {
-        host: 'http://127.0.0.1:8000',
+        host,
         goods_list: [],         // 购物车中的商品
         origin_input: 1,        // 商品数量
     },
@@ -57,11 +57,29 @@
             for (let i = 0; i < this.goods_list.length; i++) {
                 this.goods_list[i].selected = select;
             }
+
+            let data = {selected:select};
+            let headers = {
+                headers: {'Authorization': 'JWT ' + (sessionStorage.token || localStorage.token)}
+            };
+            axios.put(this.host+'/cart/selected/', data, headers).then(response => {
+                alert('修改成功!');
+            }).catch(error => {
+                alert(error.response.data.msg);
+            })
         },
 
         // 获取购物车商品数据
         get_cart_goods: function () {
-           //发送请求
+           //发送请求\
+            var headers = {
+                headers: {'Authorization': 'JWT ' + (sessionStorage.token || localStorage.token)}
+            };
+            axios.get(this.host+'/cart/', headers).then(response => {
+                this.goods_list = response.data
+            }).catch(error => {
+                alert(error.response.data.msg)
+            })
         },
 
         // 点击增加购买数量
@@ -92,16 +110,61 @@
         // 更新购物车商品数量
         update_cart_count: function(goods_id, count, index) {
             //发送请求
+            var data = {
+                goods_id:goods_id,
+                count:count,
+                selected:this.goods_list[index].selected
+            };
+            var headers = {
+                headers: {'Authorization': 'JWT ' + (sessionStorage.token || localStorage.token)}
+            };
+            axios.put(this.host+'/cart/', data, headers).then(response => {
+                alert('修改成功!');
+                this.goods_list[index].count = response.data.count
+            }).catch(error => {
+                alert(error.response.data.msg);
+            })
         },
 
         // 删除购物车中的一个商品
         delete_goods: function(index){
             //发送请求
+            var headers = {
+                data:{goods_id:this.goods_list[index].id},
+                headers: {'Authorization': 'JWT ' + (sessionStorage.token || localStorage.token)}
+            };
+            axios.delete(this.host+'/cart/', headers).then(response => {
+                alert(response.data.msg);
+                window.location.href = 'cart.html'
+            }).catch(error => {
+                alert(error.response.data.msg);
+            })
+        },
+
+        // 选择商品
+        selecteCart: function(index){
+            //发送请求
+            var goods = this.goods_list[index];
+
+            var data = {
+                goods_id:goods.id,
+                count:goods.count,
+                selected:this.goods_list[index].selected == false
+            };
+            var headers = {
+                headers: {'Authorization': 'JWT ' + (sessionStorage.token || localStorage.token)}
+            };
+            axios.put(this.host+'/cart/', data, headers).then(response => {
+                alert('修改成功!');
+                this.goods_list[index].count = response.data.count
+            }).catch(error => {
+                alert(error.response.data.msg);
+            })
         },
 
         // 清空购物车
         clearCart: function(index){
             //发送请求
         },
-    }
+    },
 });

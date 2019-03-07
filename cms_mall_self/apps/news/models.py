@@ -1,6 +1,6 @@
 from django.db import models
 
-from cms_mall.utils.models import Category, BaseModel, Album
+from cms_mall_self.utils.models import Category, BaseModel, Album
 
 
 class NewsCategory(Category):

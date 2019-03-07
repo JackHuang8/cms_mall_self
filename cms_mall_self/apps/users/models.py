@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 # Create your models here.
-from cms_mall.utils.models import BaseModel
+from cms_mall_self.utils.models import BaseModel
 
 
 class User(AbstractUser):

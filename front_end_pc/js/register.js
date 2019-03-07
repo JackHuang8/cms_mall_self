@@ -1,6 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
+        host,
         // 双向绑定变量
         username: '',
         password: '',
@@ -22,6 +23,7 @@ var vm = new Vue({
         error_password_message: '请输入8-20位的登录密码',
         error_phone_message: '请输入正确的手机号',
         error_sms_code_message: '请输入短信验证码',
+        sms_code_tip: '获取验证码',
 
         // 图片验证码
         image_code_id: '',
@@ -39,6 +41,15 @@ var vm = new Vue({
                 this.error_name = true;
             } else {
                 this.error_name = false;
+                axios.get(this.host + '/usernames/' + this.username + '/count/', {responseType: 'json'}).then(response => {
+                    if (response.data.count > 0) {
+                        this.error_name_message = '用户名已存在';
+                        this.error_name = true;
+                    }
+                }).catch(error => {
+                    console.log(error.response.data);
+                    this.error_name_message = error.response.data;
+                })
             }
         },
 
@@ -86,12 +97,16 @@ var vm = new Vue({
         },
 
         // 获取短信
-        get_sms_code: function() {
+        get_sms_code: function () {
             this.check_phone();
 
             if (!this.error_phone) {
-				//发送获取请求
-				
+                axios.get(this.host + '/sms_codes/' + this.mobile + '/').then(function (response) {
+                    alert(response.data.msg);
+                }).catch(function (error) {
+                    alert('获取验证码失败')
+                })
+
             }
         },
 
@@ -103,13 +118,36 @@ var vm = new Vue({
             this.check_cpwd();
             this.check_phone();
             this.check_allow();
+            this.check_sms_code();
 
             if (this.error_name === false
                 && this.error_password === false
                 && this.error_check_password === false
                 && this.error_phone === false
-                && this.error_allow === false) {
-				//发送注册请求
+                && this.error_allow === false
+                && this.error_sms_code === false) {
+                //发送注册请求
+                var data = {
+                    username:this.username,
+                    password:this.password,
+                    password2:this.password2,
+                    mobile:this.mobile,
+                    sms_code:this.sms_code,
+                    allow:this.allow,
+                };
+                axios.post(this.host+'/users/',data).then(response =>{
+                    alert('注册成功');
+
+                    sessionStorage.clear();
+                    localStorage.clear();
+                    localStorage.token =response.data.token;
+                    localStorage.username = response.data.username;
+                    localStorage.user_id = response.data.id;
+
+                    location.href = '/index.html';
+                }).catch(error =>{
+                    alert(error.response.data.non_field_errors)
+                })
             } else {
                 alert('填写有误')
             }

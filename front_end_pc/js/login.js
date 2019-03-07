@@ -41,6 +41,31 @@ var vm = new Vue({
             if (this.error_username === false
                 && this.error_pwd === false) {
 				//发送登录请求
+                data={
+                    username:this.username,
+                    password:this.password,
+                };
+                axios.post(this.host+'/authorizations/',data).then(response =>{
+                    sessionStorage.clear();
+                    localStorage.clear();
+                    if(this.remember){
+                        localStorage.token=response.data.token;
+                        localStorage.user_id=response.data.user_id;
+                        localStorage.username=response.data.username;
+                    }else {
+                        sessionStorage.token=response.data.token;
+                        sessionStorage.user_id=response.data.user_id;
+                        sessionStorage.username=response.data.username;
+                    }
+                    alert('登陆成功!');
+                    location.href = '/index.html'
+                }).catch(error =>{
+                    if (error.response.status == 400){
+                        this.error_msg = '用户名或密码错误'
+                    }else {
+                        this.error_msg = '服务器错误'
+                    }
+                })
             }
         },
     }

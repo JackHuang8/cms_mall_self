@@ -30,7 +30,11 @@ var vm = new Vue({
 
     mounted: function () {
         // 获取所有的省份,发送请求
-		
+		axios.get(this.host+'/areas/').then(response => {
+		    this.provinces = response.data;
+        }).catch(error => {
+            alert(error.response.data);
+        })
         
     },
 
@@ -39,6 +43,12 @@ var vm = new Vue({
         'form_address.province_id': function () {
             if (this.form_address.province_id) {
                 //发送请求
+                axios.get(this.host+'/areas/'+this.form_address.province_id+'/').then(response => {
+                    this.cities =response.data.subs;
+                }).catch(error => {
+                    alert(error.response.data);
+                    this.cities = [];
+                })
             }
         },
 
@@ -46,6 +56,12 @@ var vm = new Vue({
         'form_address.city_id': function () {
             if (this.form_address.city_id) {
                //发送请求
+                axios.get(this.host+'/areas/'+this.form_address.city_id+'/').then(response => {
+                    this.districts =response.data.subs;
+                }).catch(error => {
+                    alert(error.response.data);
+                    this.districts = [];
+                })
             }
         }
     },
@@ -108,9 +124,15 @@ var vm = new Vue({
                 || !this.form_address.district_id) {
                 alert('信息填写有误！');
             } else {
-                this.form_address.title = this.form_address.receiver;
+                // this.form_address.title = this.form_address.receiver;
                 // 新增地址,发送请求
-                
+                var headers = {headers: {'Authorization': 'JWT ' + this.token}};
+                axios.post(this.host+'/addresses/',this.form_address,headers).then(response =>{
+                    alert('添加地址成功!');
+                    location.href = 'user_center_address.html';
+                }).catch(error => {
+                    alert(error.response.data);
+                })
             }
         },
     }

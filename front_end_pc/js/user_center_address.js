@@ -11,7 +11,14 @@ var vm = new Vue({
 
     mounted: function(){
         // 请求当前登录用户的所有的地址
-       
+        var headers = {headers: {'Authorization': 'JWT ' + this.token}};
+       axios.get(this.host+'/addresses/',headers).then(response => {
+           this.addresses = response.data.addresses;
+           this.user_id = response.data.user_id;
+           this.default_address_id = response.data.default_address_id;
+       }).catch(error =>{
+           alert(error.reponse.data)
+       })
     },
 
     methods: {
@@ -22,13 +29,24 @@ var vm = new Vue({
                 return
             }
 			//发送请求
-           
+            var headers = {headers: {'Authorization': 'JWT ' + this.token}};
+           axios.put(this.host+'/addresses/'+this.default_address_id+'/status/',{}, headers).then(response => {
+               alert(response.data.msg);
+           }).catch(error => {
+               alert(error.response.data)
+           })
         },
 
         // 删除地址
         delete_address: function (address_id) {
             // 发送请求
-            
+            var headers = {headers: {'Authorization': 'JWT ' + this.token}};
+           axios.delete(this.host+'/addresses/'+address_id+'/', headers).then(response => {
+               alert('删除成功');
+               window.location.href = 'user_center_address.html';
+           }).catch(error => {
+               alert(error.response.data);
+           })
         }
     }
 });
